@@ -8,10 +8,10 @@ using Basic.Common;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using ServiceFabric.Data.Mocks;
-using ServiceFabric.Extensions.Services.Queryable.LINQ;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using ServiceFabric.Extensions.Data.Indexing.Persistent;
+using ServiceFabric.Extensions.Services.Queryable.LINQ;
 
 namespace ServiceFabric.Extensions.Services.Queryable.Test
 {
