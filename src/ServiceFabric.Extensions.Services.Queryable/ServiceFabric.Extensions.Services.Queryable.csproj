@@ -6,7 +6,6 @@
     <AssemblyVersion>3.1.274.0</AssemblyVersion>
     <FileVersion>3.1.274.0</FileVersion>
     <Description>Query support to enable the Data Explorer in Service Fabric Explorer.</Description>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageTags>Azure, ServiceFabric, Microsoft, Fabric, Data Explorer, Query</PackageTags>
     <PackageProjectUrl>https://github.com/jessebenson/service-fabric-queryable</PackageProjectUrl>
     <Platforms>AnyCPU;x64</Platforms>
