@@ -46,11 +46,10 @@ namespace ServiceFabric.Extensions.Services.Queryable.LINQ
                 using (var tx = stateManager.CreateTransaction())
                 {
                     IEnumerable<KeyValuePair<TKey, TValue>> pairs = await dictionary.GetAllAsync(tx, keys, TimeSpan.FromSeconds(4), new CancellationToken()).AsEnumerable();
-                    values = new KeyValueToValueEnumerable<TKey, TValue>(pairs);
+                    values = new KeyValueToValueEnumerable<TKey, TValue>(pairs);                    
+                    queryableValues = values.AsQueryable<TValue>();
                     await tx.CommitAsync();
-                }
-
-                queryableValues = values.AsQueryable<TValue>();
+                }                
 
             }
             else
@@ -60,14 +59,10 @@ namespace ServiceFabric.Extensions.Services.Queryable.LINQ
                 {
                     IAsyncEnumerable<KeyValuePair<TKey, TValue>> pairs = dictionary.CreateEnumerableAsync(tx, EnumerationMode.Ordered).Result;
                     values = new KeyValueToValueAsyncEnumerable<TKey, TValue>(pairs);
+                    queryableValues = (values.AsEnumerable().Result).AsQueryable<TValue>();
                     await tx.CommitAsync();
-                }
-
-                queryableValues = (values.AsEnumerable().Result).AsQueryable<TValue>();
+                }                
             }
-
-
-
 
             // Copy the expression tree that was passed in, changing only the first 
             // argument of the innermost MethodCallExpression.
