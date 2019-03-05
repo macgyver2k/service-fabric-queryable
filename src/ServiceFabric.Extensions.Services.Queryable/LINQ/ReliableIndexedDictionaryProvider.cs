@@ -49,8 +49,7 @@ namespace ServiceFabric.Extensions.Services.Queryable.LINQ
         // It is also called from QueryableTerraServerData.GetEnumerator(). 
         public TResult Execute<TResult>(Expression expression)
         {
-            bool IsEnumerable = (typeof(TResult).Name == "IEnumerable`1");
-            Type innerType = typeof(TResult).GenericTypeArguments[0];
+            bool IsEnumerable = (typeof(TResult).Name == "IEnumerable`1");            
             var result = (Task<object>)ReliableIndexedDictionaryQueryContext.Execute<TKey, TValue>(expression, StateManager, Dictionary, IsEnumerable);
             return (TResult)result.Result;
         }
