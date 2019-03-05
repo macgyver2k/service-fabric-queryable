@@ -25,23 +25,7 @@ using ServiceFabric.Extensions.Data.Indexing.Persistent;
 namespace ServiceFabric.Extensions.Services.Queryable
 {
 	internal static class ReliableStateExtensions
-	{
-        private static async Task<IReliableIndexedDictionary<TKey, TValue>> GetIndexedDictionaryByPropertyName<TKey, TValue, TFilter>(IReliableStateManager stateManager, string dictName, string propertyName)
-                    where TKey : IComparable<TKey>, IEquatable<TKey>
-                    where TFilter : IComparable<TFilter>, IEquatable<TFilter>
-        {
-            FilterableIndex<TKey, TValue, TFilter> filter = FilterableIndex<TKey, TValue, TFilter>.CreateQueryableInstance(propertyName);
-            ConditionalValue<IReliableIndexedDictionary<TKey, TValue>> dictOption = await stateManager.TryGetIndexedAsync<TKey, TValue>(dictName, new[] { filter });
-            if (dictOption.HasValue)
-            {
-                return dictOption.Value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
+	{	        
         public static async Task<IEnumerable<TKey>> TryFilterNode<TKey, TValue>(SingleValueNode node, bool notIsApplied, IReliableStateManager stateManager, string dictName, CancellationToken cancellationToken)
             where TKey : IComparable<TKey>, IEquatable<TKey>
         {
@@ -205,51 +189,7 @@ namespace ServiceFabric.Extensions.Services.Queryable
             }
         }
 
-        // This is a seperate method because we now know PropertyType, so want to not use reflection in above method
-        public static async Task<IEnumerable<TKey>> FilterHelper<TKey, TValue, TFilter>(IReliableIndexedDictionary<TKey, TValue> dictionary, TFilter constant, BinaryOperatorKind strategy, bool notIsApplied, CancellationToken cancellationToken, IReliableStateManager stateManager, string propertyName)
-            where TFilter : IComparable<TFilter>, IEquatable<TFilter>
-            where TKey : IComparable<TKey>, IEquatable<TKey>
-        {
-
-            using (var tx = stateManager.CreateTransaction())
-            {
-                IEnumerable<TKey> result;
-                // Equals
-                if ((strategy == BinaryOperatorKind.Equal && !notIsApplied) ||
-                    (strategy == BinaryOperatorKind.NotEqual && notIsApplied))
-                {
-                    result = await dictionary.FilterKeysOnlyAsync(tx, propertyName, constant, TimeSpan.FromSeconds(4), cancellationToken);
-                }
-                else if ((strategy == BinaryOperatorKind.GreaterThan && !notIsApplied) ||
-                         (strategy == BinaryOperatorKind.LessThan && notIsApplied))
-                {
-                    result = await dictionary.RangeFromFilterKeysOnlyAsync(tx, propertyName, constant, RangeFilterType.Exclusive, TimeSpan.FromSeconds(4), cancellationToken);
-                }
-                else if ((strategy == BinaryOperatorKind.GreaterThanOrEqual && !notIsApplied) ||
-                         (strategy == BinaryOperatorKind.LessThanOrEqual && notIsApplied))
-                {
-                    result = await dictionary.RangeFromFilterKeysOnlyAsync(tx, propertyName, constant, RangeFilterType.Inclusive, TimeSpan.FromSeconds(4), cancellationToken);
-                }
-                else if ((strategy == BinaryOperatorKind.LessThan && !notIsApplied) ||
-                         (strategy == BinaryOperatorKind.GreaterThan && notIsApplied))
-                {
-                    result = await dictionary.RangeToFilterKeysOnlyAsync(tx, propertyName, constant, RangeFilterType.Exclusive, TimeSpan.FromSeconds(4), cancellationToken);
-                }
-                else if ((strategy == BinaryOperatorKind.LessThanOrEqual && !notIsApplied) ||
-                         (strategy == BinaryOperatorKind.GreaterThanOrEqual && notIsApplied))
-                {
-                    result = await dictionary.RangeToFilterKeysOnlyAsync(tx, propertyName, constant, RangeFilterType.Inclusive, TimeSpan.FromSeconds(4), cancellationToken);
-                }
-                else
-                {
-                    // Bad State, should never hit
-                    throw new NotSupportedException("Does not support Add, Subtract, Modulo, Multiply, Divide operations.");
-                }
-                await tx.CommitAsync();
-                return result;
-            }
-
-        }
+      
 
         private static bool isFilterableNode2(SingleValueNode node, bool notIsApplied)
         {
